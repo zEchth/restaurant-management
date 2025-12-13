@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/zEchth/restaurant-management#readme",
   "dependencies": {
-    "@prisma/client": "^7.1.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -27,10 +26,11 @@
     "helmet": "^8.1.0",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.10.1",
-    "prisma": "^7.1.0"
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@prisma/client": "^6.19.0",
+    "nodemon": "^3.1.11",
+    "prisma": "^6.19.0"
   }
 }
