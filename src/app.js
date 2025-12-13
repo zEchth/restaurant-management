@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const menuRoutes = require('./routes/menuRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 
 const app = express();
 
@@ -23,6 +24,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/menus', menuRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // 404 Handler (Route Not Found)
 app.use((req, res, next) => {
