@@ -40,6 +40,7 @@ Auth: Bearer Token (Header `Authorization`)
 | :--- | :--- | :--- | :--- |
 | GET | `/` | **Admin** | List Semua Karyawan. |
 | POST | `/` | **Admin** | Registrasi Staff Baru. Body: `{name, email, password, role}` |
+| PATCH | `/:id` | **Admin / Self** | Update Data Karyawan atau Profil Sendiri. Body: `{name, email, password, role}` |
 | DELETE | `/:id` | **Admin** | Hapus Akses Karyawan. |
 
 ## 6. System
