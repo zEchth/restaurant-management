@@ -3,7 +3,9 @@ const jwt = require('jsonwebtoken');
 const generateTokens = (user) => {
   const payload = {
     id: user.id,
-    role: user.role
+    role: user.role,
+    name: user.name,
+    email: user.email,
   };
 
   // Access Token (15 menit)

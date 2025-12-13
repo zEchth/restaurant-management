@@ -11,7 +11,7 @@ exports.createOrder = async (req, res, next) => {
       return errorResponse(res, 400, error.details[0].message);
     }
 
-    const { items } = value;
+    const { items, tableNumber, orderType } = req.body;
 
     // Cek Menu di DB
     const menuIds = items.map(item => item.menuId);
@@ -47,6 +47,8 @@ exports.createOrder = async (req, res, next) => {
           userId: req.user.id,
           totalPrice: totalPrice,
           status: 'PENDING',
+          tableNumber: tableNumber || '-', // Default strip jika kosong
+          orderType: orderType || 'DINE_IN',
           orderItems: {
             create: orderItemsData
           }

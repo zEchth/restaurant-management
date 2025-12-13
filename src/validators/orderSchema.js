@@ -9,7 +9,9 @@ const createOrderSchema = Joi.object({
   ).min(1).required().messages({
     'array.min': 'Order harus memiliki minimal 1 item',
     'any.required': 'Daftar item wajib diisi'
-  })
+  }),
+  tableNumber: Joi.string().allow('', null).optional(),
+  orderType: Joi.string().valid('DINE_IN', 'TAKE_AWAY').default('DINE_IN')
 });
 
 module.exports = { createOrderSchema };
