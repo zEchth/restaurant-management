@@ -5,8 +5,9 @@ const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 // Semua route di sini butuh Login & Role ADMIN
 router.use(authenticate);
-router.use(authorize('ADMIN'));
+router.patch('/:id', userController.updateUser);
 
+router.use(authorize('ADMIN'));
 router.get('/', userController.getAllUsers);
 router.post('/', userController.createUser);
 router.delete('/:id', userController.deleteUser);

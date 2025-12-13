@@ -29,6 +29,17 @@ app.use('/api/menus', menuRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 
+// --- HEALTH CHECK ENDPOINT (WAJIB UTK AWS) ---
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Server is running healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// --- SERVE FRONTEND (STATIC FILES) ---
 const frontendPath = path.join(__dirname, '../../restaurant-frontend/dist');
 app.use(express.static(frontendPath));
 
