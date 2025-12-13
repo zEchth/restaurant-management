@@ -91,7 +91,6 @@ model Order {
 }
 
 // 5. Junction Table (Implementasi Many-to-Many Order <-> Menu)
-// Ini memenuhi syarat: "Relasi Many-to-Many - Minimal 1 implementasi (junction table)"
 model OrderItem {
   id        Int      @id @default(autoincrement())
   quantity  Int
