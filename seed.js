@@ -1,6 +1,8 @@
-// seed.js
 require('dotenv').config();
-const { PrismaClient } = require('./generated/prisma');
+// Pastikan path import ini sesuai dengan setup Anda.
+// Standarnya adalah: const { PrismaClient } = require('@prisma/client');
+// Tapi jika Anda custom output, gunakan yang sesuai (misal: ./generated/prisma)
+const { PrismaClient } = require('@prisma/client'); 
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
@@ -8,9 +10,9 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting Database Seeder...');
 
-  // 1. CLEANUP (Hapus data lama agar bersih/idempotent)
-  // Urutan menghapus PENTING: Anak dulu, baru Orang Tua (Foreign Key Constraint)
+  // 1. CLEANUP (Hapus data lama)
   console.log('🧹 Cleaning up old data...');
+  // Hapus dari anak ke induk (Foreign Key Constraints)
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
   await prisma.menu.deleteMany();
@@ -56,47 +58,55 @@ async function main() {
 
   // 4. CREATE MENUS
   console.log('🍔 Creating Menus...');
-  const menus = await prisma.menu.createMany({
+  // Simpan hasil create ke variabel agar bisa diambil ID-nya
+  // Note: createMany tidak mengembalikan data di SQLite/Postgres tertentu, 
+  // jadi kita create satu-satu atau query ulang. Untuk aman, kita query ulang.
+  
+  await prisma.menu.createMany({
     data: [
-      { name: 'Nasi Goreng Spesial', price: 25000, categoryId: catMakanan.id, description: 'Pedas Mantap' },
-      { name: 'Ayam Bakar Madu', price: 30000, categoryId: catMakanan.id, description: 'Manis Gurih' },
-      { name: 'Es Teh Manis', price: 5000, categoryId: catMinuman.id },
-      { name: 'Kopi Susu Gula Aren', price: 18000, categoryId: catMinuman.id },
-      { name: 'Kentang Goreng', price: 15000, categoryId: catSnack.id },
-      { name: 'Pisang Bakar Coklat', price: 12000, categoryId: catSnack.id },
+      { name: 'Nasi Goreng Spesial', price: 25000, categoryId: catMakanan.id, description: 'Pedas Mantap', isAvailable: true },
+      { name: 'Ayam Bakar Madu', price: 30000, categoryId: catMakanan.id, description: 'Manis Gurih', isAvailable: true },
+      { name: 'Es Teh Manis', price: 5000, categoryId: catMinuman.id, isAvailable: true },
+      { name: 'Kopi Susu Gula Aren', price: 18000, categoryId: catMinuman.id, isAvailable: true },
+      { name: 'Kentang Goreng', price: 15000, categoryId: catSnack.id, isAvailable: true },
+      { name: 'Pisang Bakar Coklat', price: 12000, categoryId: catSnack.id, isAvailable: true },
     ]
   });
 
-  // 5. CREATE DUMMY ORDERS (Opsional: Agar list tidak kosong saat demo)
-  console.log('📝 Creating Dummy Orders...');
-  
-  // Kita perlu ID menu yang baru dibuat
+  // Ambil data menu yang baru dibuat
   const allMenus = await prisma.menu.findMany();
-  
-  // Order 1 oleh Budi
+
+  // 5. CREATE DUMMY ORDERS
+  console.log('📝 Creating Dummy Orders...');
+
+  // Order 1 (DINE IN - MEJA 5)
   await prisma.order.create({
     data: {
       userId: staff1.id,
       status: 'PAID',
       totalPrice: 55000,
+      orderType: 'DINE_IN',     // <--- FITUR BARU
+      tableNumber: '5',         // <--- FITUR BARU
       orderItems: {
         create: [
-          { menuId: allMenus[0].id, quantity: 1, price: allMenus[0].price }, // Nasgor
-          { menuId: allMenus[1].id, quantity: 1, price: allMenus[1].price }  // Ayam
+          { menuId: allMenus[0].id, quantity: 1, price: allMenus[0].price }, 
+          { menuId: allMenus[1].id, quantity: 1, price: allMenus[1].price }
         ]
       }
     }
   });
 
-  // Order 2 oleh Siti
+  // Order 2 (TAKE AWAY)
   await prisma.order.create({
     data: {
       userId: staff2.id,
       status: 'PENDING',
       totalPrice: 10000,
+      orderType: 'TAKE_AWAY',   // <--- FITUR BARU
+      tableNumber: '-',         // <--- FITUR BARU
       orderItems: {
         create: [
-          { menuId: allMenus[2].id, quantity: 2, price: allMenus[2].price } // 2 Es Teh
+          { menuId: allMenus[2].id, quantity: 2, price: allMenus[2].price }
         ]
       }
     }

@@ -1,6 +1,59 @@
-# Keep environment variables out of version control
-node_modules
-/generated/prisma
+# ------------------------------------------------
+# Node.js & Dependency
+# ------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------------------------------
+# Environment Variables (SANGAT PENTING: JANGAN DIHAPUS)
+# ------------------------------------------------
+# File ini berisi password & secret key, haram masuk GitHub!
 .env
-dist
-generated
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ------------------------------------------------
+# Prisma & Database
+# ------------------------------------------------
+# Abaikan file database SQLite (karena isinya data lokal/dev)
+*.db
+*.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# Jika Anda menyimpan generated client di folder khusus
+generated/
+prisma/generated/
+
+# ------------------------------------------------
+# Build Output (Frontend & Backend)
+# ------------------------------------------------
+# Folder hasil build React (Vite)
+dist/
+dist-ssr/
+build/
+
+# Folder coverage hasil testing
+coverage/
+
+# ------------------------------------------------
+# OS & Editor Files (Sampah Sistem)
+# ------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ------------------------------------------------
+# Optional: Logs
+# ------------------------------------------------
+logs
+*.log
+npm-debug.log*

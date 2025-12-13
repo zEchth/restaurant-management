@@ -11,6 +11,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 const app = express();
+const path = require('path');
 
 // Global Middleware
 app.use(cors());
@@ -27,6 +28,15 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/menus', menuRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
+
+const frontendPath = path.join(__dirname, '../../restaurant-frontend/dist');
+app.use(express.static(frontendPath));
+
+// 2. Handle React Routing (SPA)
+// Jika route tidak dikenali API, kirimkan index.html React
+app.use((req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 // 404 Handler (Route Not Found)
 app.use((req, res, next) => {
