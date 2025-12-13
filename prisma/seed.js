@@ -1,7 +1,5 @@
-require('dotenv').config();
-// Pastikan path import ini sesuai dengan setup Anda.
-// Standarnya adalah: const { PrismaClient } = require('@prisma/client');
-// Tapi jika Anda custom output, gunakan yang sesuai (misal: ./generated/prisma)
+require('dotenv').config({ path: '../.env' });
+
 const { PrismaClient } = require('@prisma/client'); 
 const bcrypt = require('bcrypt');
 
@@ -59,8 +57,6 @@ async function main() {
   // 4. CREATE MENUS
   console.log('🍔 Creating Menus...');
   // Simpan hasil create ke variabel agar bisa diambil ID-nya
-  // Note: createMany tidak mengembalikan data di SQLite/Postgres tertentu, 
-  // jadi kita create satu-satu atau query ulang. Untuk aman, kita query ulang.
   
   await prisma.menu.createMany({
     data: [
@@ -86,7 +82,7 @@ async function main() {
       status: 'PAID',
       totalPrice: 55000,
       orderType: 'DINE_IN',     // <--- FITUR BARU
-      tableNumber: '5',         // <--- FITUR BARU
+      tableNumber: '5',       
       orderItems: {
         create: [
           { menuId: allMenus[0].id, quantity: 1, price: allMenus[0].price }, 
@@ -102,8 +98,8 @@ async function main() {
       userId: staff2.id,
       status: 'PENDING',
       totalPrice: 10000,
-      orderType: 'TAKE_AWAY',   // <--- FITUR BARU
-      tableNumber: '-',         // <--- FITUR BARU
+      orderType: 'TAKE_AWAY', 
+      tableNumber: '-',         
       orderItems: {
         create: [
           { menuId: allMenus[2].id, quantity: 2, price: allMenus[2].price }

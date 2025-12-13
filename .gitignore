@@ -26,10 +26,6 @@ pnpm-debug.log*
 prisma/*.db
 prisma/*.db-journal
 
-# Jika Anda menyimpan generated client di folder khusus
-generated/
-prisma/generated/
-
 # ------------------------------------------------
 # Build Output (Frontend & Backend)
 # ------------------------------------------------

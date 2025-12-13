@@ -1,4 +1,4 @@
-const { PrismaClient } = require('../../generated/prisma');
+const { PrismaClient } = require('@prisma/client');
 
 // Inisialisasi Client
 // Log query berguna saat development untuk melihat RAW SQL yang dieksekusi
