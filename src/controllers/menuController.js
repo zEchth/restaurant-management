@@ -3,6 +3,8 @@ const prisma = require('../config/db');
 const { successResponse, errorResponse } = require('../utils/responseHelper');
 const { createMenuSchema, updateMenuSchema } = require('../validators/menuSchema');
 
+// Lengkap dengan fitur Pagination & Search agar memenuhi syarat "Fitur Wajib List Endpoint"
+
 // 1. GET ALL MENUS (Public/User/Admin)
 // Mendukung Pagination & Search Name
 exports.getAllMenus = async (req, res, next) => {
