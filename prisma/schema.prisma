@@ -2,10 +2,111 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "sqlite"
+}
+
+// Enums
+enum Role {
+  USER  // staff/kasir
+  ADMIN // Owner
+}
+
+enum OrderStatus {
+  PENDING 
+  PAID
+  CANCELLED 
+  READY
+}
+
+// 1. Model User
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relasi One-to-Many: Satu User (Kasir) menangani banyak Order
+  orders    Order[]
+
+  @@index([email])
+}
+
+// 2. Entitas Utama 1: Category (Kategori Makanan/Minuman)
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique // Contoh: "Makanan Berat", "Minuman", "Dessert"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relasi One-to-Many: Satu Kategori memiliki banyak Menu
+  menus     Menu[]
+}
+
+// 3. Entitas Utama 2: Menu (Item Produk)
+model Menu {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign Key ke Category
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  // Relasi Many-to-Many (via Junction Table): Menu bisa ada di banyak Order
+  orderItems  OrderItem[]
+
+  @@index([name])
+  @@index([categoryId])
+}
+
+// 4. Entitas Utama 3: Order (Transaksi)
+model Order {
+  id          Int         @id @default(autoincrement())
+  totalPrice  Decimal     @default(0)
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Foreign Key ke User (Siapa kasir yang memproses)
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  // Relasi Many-to-Many (via Junction Table): Order berisi banyak Menu
+  orderItems  OrderItem[]
+
+  @@index([userId])
+  @@index([createdAt]) // Index untuk filtering laporan harian
+}
+
+// 5. Junction Table (Implementasi Many-to-Many Order <-> Menu)
+// Ini memenuhi syarat: "Relasi Many-to-Many - Minimal 1 implementasi (junction table)"
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  price     Decimal  // Harga snapshot saat transaksi terjadi (penting jika harga menu berubah)
+  
+  // Relasi ke Order
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Relasi ke Menu
+  menuId    Int
+  menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orderId, menuId]) // Mencegah duplikasi menu yang sama dalam satu order (gunakan update quantity)
 }
