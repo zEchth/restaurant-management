@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/db');
 
-// A. Middleware Autentikasi (Sudah ada, diperjelas error handlingnya)
+// A. Middleware Autentikasi 
 exports.authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
