@@ -110,3 +110,24 @@ exports.getOrders = async (req, res, next) => {
     next(err);
   }
 };
+
+// Batalkan Order (Soft Delete atau Update Status)
+exports.cancelOrder = async (req, res, next) => {
+  try {
+    const orderId = parseInt(req.params.id);
+
+    // Kita update status jadi CANCELLED (Best Practice daripada hapus data permanen)
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: { status: 'CANCELLED' }
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Order berhasil dibatalkan',
+      data: updatedOrder
+    });
+  } catch (err) {
+    next(err);
+  }
+};
