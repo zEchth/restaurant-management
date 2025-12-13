@@ -4,21 +4,40 @@ const orderController = require('../controllers/orderController');
 const { authenticate, authorize } = require('../middleware/authMiddleware');
 const { checkOrderOwnership } = require('../middleware/ownershipMiddleware');
 
-// 1. Semua route di bawah ini butuh Login (Authentication)
+// ==========================================================
+// GLOBAL MIDDLEWARE
+// Semua route di bawah ini mewajibkan Login (Token Valid)
+// ==========================================================
 router.use(authenticate);
 
-// 2. Get All Orders & Create Order
-// Staff (USER) boleh buat order, Admin boleh
+
+// ==========================================================
+// ROUTE UMUM (Tanpa ID)
+// ==========================================================
+
+// GET /api/orders (List semua order dengan filter/pagination)
 router.get('/', authorize('USER', 'ADMIN'), orderController.getOrders);
+
+// POST /api/orders (Buat order baru)
 router.post('/', authorize('USER', 'ADMIN'), orderController.createOrder);
 
-// 3. Delete/Cancel Order (BOLA Protected)
-// - Butuh Login
-// - Role minimal USER atau ADMIN
-// - CheckOwnership: Hanya pembuat order atau Admin yang bisa hapus
+
+// ==========================================================
+// ROUTE SPESIFIK (Butuh ID)
+// ==========================================================
+
+// GET /api/orders/:id (Lihat Detail Order) <--- INI YANG BARU DITAMBAHKAN
+router.get('/:id', authorize('USER', 'ADMIN'), orderController.getOrderById);
+
+// PATCH /api/orders/:id/status (Update Status: PAID/READY)
+router.patch('/:id/status', authorize('USER', 'ADMIN'), orderController.updateStatus);
+
+// DELETE /api/orders/:id (Cancel Order)
+// Khusus route ini kita pakai middleware tambahan 'checkOrderOwnership'
+// agar proteksinya berlapis (BOLA Protection)
 router.delete('/:id', 
   authorize('USER', 'ADMIN'), 
-  checkOrderOwnership, // <--- Ini Guardrail BOLA-nya
+  checkOrderOwnership, 
   orderController.cancelOrder
 );
 

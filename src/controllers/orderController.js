@@ -1,133 +1,214 @@
 const prisma = require('../config/db');
+const { successResponse, errorResponse } = require('../utils/responseHelper');
 const { createOrderSchema } = require('../validators/orderSchema');
 
-// Create New Order
+// 1. CREATE ORDER
 exports.createOrder = async (req, res, next) => {
   try {
-    // 1. Validasi Input (Joi)
+    // Validasi Input
     const { error, value } = createOrderSchema.validate(req.body);
     if (error) {
-      return res.status(400).json({ 
-        status: 'fail', 
-        message: error.details[0].message 
-      });
+      return errorResponse(res, 400, error.details[0].message);
     }
 
-    const { items } = value; // items = [{ menuId: 1, quantity: 2 }, ...]
+    const { items } = value;
 
-    // 2. Ambil Data Menu dari Database (Untuk mendapatkan harga ASLI)
-    // Jangan pernah percaya harga yang dikirim dari frontend
+    // Cek Menu di DB
     const menuIds = items.map(item => item.menuId);
     const dbMenus = await prisma.menu.findMany({
       where: {
         id: { in: menuIds },
-        isAvailable: true // Hanya ambil menu yang tersedia
+        isAvailable: true
       }
     });
 
-    // Cek jika ada menu yang tidak ditemukan / habis
     if (dbMenus.length !== menuIds.length) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Beberapa menu tidak ditemukan atau stok habis'
-      });
+      return errorResponse(res, 404, 'Beberapa menu tidak ditemukan atau stok habis');
     }
 
-    // 3. Hitung Total Price & Siapkan Data OrderItem
+    // Hitung Total & Siapkan Data Item
     let totalPrice = 0;
     const orderItemsData = items.map(item => {
       const menuInfo = dbMenus.find(m => m.id === item.menuId);
       const subtotal = Number(menuInfo.price) * item.quantity;
-      
       totalPrice += subtotal;
 
       return {
         menuId: item.menuId,
         quantity: item.quantity,
-        price: menuInfo.price // Simpan harga snapshot saat transaksi
+        price: menuInfo.price
       };
     });
 
-    // 4. Eksekusi Database Transaction (Atomic Operation)
-    // Order dan OrderItems dibuat bersamaan. Jika satu gagal, semua batal.
+    // Transaksi Database
     const newOrder = await prisma.$transaction(async (tx) => {
       return await tx.order.create({
         data: {
-          userId: req.user.id, // ID Kasir dari token JWT
+          userId: req.user.id,
           totalPrice: totalPrice,
           status: 'PENDING',
           orderItems: {
-            create: orderItemsData // Nested write (Prisma feature)
+            create: orderItemsData
           }
         },
         include: {
           orderItems: {
-            include: { menu: true } // Return detail menu di response
+            include: { menu: true }
           }
         }
       });
     });
 
-    // 5. Response Sukses
-    res.status(201).json({
-      status: 'success',
-      data: {
-        orderId: newOrder.id,
-        totalPrice: newOrder.totalPrice,
-        status: newOrder.status,
-        items: newOrder.orderItems.map(item => ({
-          name: item.menu.name,
-          qty: item.quantity,
-          price: item.price
-        })),
-        cashier: req.user.name
-      }
+    // Gunakan helper successResponse
+    return successResponse(res, 201, 'Order berhasil dibuat', {
+      orderId: newOrder.id,
+      totalPrice: newOrder.totalPrice,
+      status: newOrder.status,
+      items: newOrder.orderItems.map(item => ({
+        name: item.menu.name,
+        qty: item.quantity,
+        price: item.price
+      })),
+      cashier: req.user.name
     });
 
-  } catch (err) {
-    next(err); // Lempar ke Error Handling Middleware
-  }
-};
-
-// Get All Orders (Untuk Dapur/Laporan)
-exports.getOrders = async (req, res, next) => {
-  try {
-    const orders = await prisma.order.findMany({
-      include: {
-        user: { select: { name: true } }, // Ambil nama kasir saja
-        orderItems: {
-          include: { menu: { select: { name: true } } }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    res.status(200).json({
-      status: 'success',
-      data: orders
-    });
   } catch (err) {
     next(err);
   }
 };
 
-// Batalkan Order (Soft Delete atau Update Status)
+// 2. GET ALL ORDERS (Advanced: Pagination, Filter, Search)
+exports.getOrders = async (req, res, next) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      order = 'desc',
+      status,
+      search,
+      startDate,
+      endDate
+    } = req.query;
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Filter Logic
+    const whereClause = {};
+
+    // Filter Role (User lihat punya sendiri, Admin lihat semua)
+    if (req.user.role !== 'ADMIN') {
+      whereClause.userId = req.user.id;
+    }
+
+    // Filter Status
+    if (status) whereClause.status = status;
+
+    // Search Nama Kasir
+    if (search) {
+      whereClause.user = {
+        name: { contains: search } // SQLite default case-insensitive
+      };
+    }
+
+    // Filter Tanggal
+    if (startDate || endDate) {
+      whereClause.createdAt = {};
+      if (startDate) whereClause.createdAt.gte = new Date(startDate);
+      if (endDate) whereClause.createdAt.lte = new Date(endDate);
+    }
+
+    // Query Database
+    const [totalRecords, orders] = await Promise.all([
+      prisma.order.count({ where: whereClause }),
+      prisma.order.findMany({
+        where: whereClause,
+        skip: skip,
+        take: limitNum,
+        orderBy: { [sortBy]: order },
+        include: {
+          user: { select: { name: true } },
+          orderItems: { include: { menu: { select: { name: true } } } }
+        }
+      })
+    ]);
+
+    const paginationInfo = {
+      totalRecords,
+      totalPages: Math.ceil(totalRecords / limitNum),
+      currentPage: pageNum,
+      limit: limitNum
+    };
+
+    return successResponse(res, 200, 'List pesanan berhasil diambil', orders, paginationInfo);
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 3. GET SINGLE ORDER (Detail)
+exports.getOrderById = async (req, res, next) => {
+  try {
+    const orderId = parseInt(req.params.id);
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        user: { select: { name: true, email: true } },
+        orderItems: { include: { menu: true } }
+      }
+    });
+
+    if (!order) return errorResponse(res, 404, 'Order tidak ditemukan');
+
+    // Cek kepemilikan (Ownership)
+    if (req.user.role !== 'ADMIN' && order.userId !== req.user.id) {
+      return errorResponse(res, 403, 'Akses ditolak');
+    }
+
+    return successResponse(res, 200, 'Detail order berhasil diambil', order);
+  } catch (err) { next(err); }
+};
+
+// 4. UPDATE STATUS (PATCH)
+exports.updateStatus = async (req, res, next) => {
+  try {
+    const orderId = parseInt(req.params.id);
+    const { status } = req.body;
+
+    const allowedStatuses = ['PAID', 'READY', 'PENDING', 'CANCELLED'];
+    if (!allowedStatuses.includes(status)) {
+      return errorResponse(res, 400, 'Status tidak valid');
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: { status: status }
+    });
+
+    return successResponse(res, 200, `Status berhasil diubah jadi ${status}`, updatedOrder);
+
+  } catch (err) {
+    if (err.code === 'P2025') return errorResponse(res, 404, 'Order tidak ditemukan');
+    next(err);
+  }
+};
+
+// 5. CANCEL ORDER (DELETE) - Ini yang tadi hilang!
 exports.cancelOrder = async (req, res, next) => {
   try {
     const orderId = parseInt(req.params.id);
 
-    // Kita update status jadi CANCELLED (Best Practice daripada hapus data permanen)
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { status: 'CANCELLED' }
     });
 
-    res.status(200).json({
-      status: 'success',
-      message: 'Order berhasil dibatalkan',
-      data: updatedOrder
-    });
+    return successResponse(res, 200, 'Order berhasil dibatalkan', updatedOrder);
   } catch (err) {
+    if (err.code === 'P2025') return errorResponse(res, 404, 'Order tidak ditemukan');
     next(err);
   }
 };
