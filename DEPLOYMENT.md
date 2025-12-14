@@ -6,44 +6,43 @@
 
 ## Langkah Deployment
 
-### 1. Clone & Setup Repository
+### 1. Clone & Setup Repository Backend
 Di server, clone repository proyek:
 ```bash
-git clone [https://github.com/username/repo-anda.git](https://github.com/username/repo-anda.git)
-cd repo-anda
-```
+mkdir resto-app
+cd reso-app
 
-### 2. Build Frontend
-```bash
-cd restaurant-frontend
+git clone https://github.com/zEchth/restaurant-management.git
+cd restaurant-management
 npm install
-npm run build
-```
-
-### 3. Setup Backend
-``` bash
-cd ../restaurant-management
-npm install
-
-# Konfigurasi Environment Production
 cp .env.example .env
-nano .env 
-# (Ubah NODE_ENV=production, ganti JWT Secret, dll)
+nano .env  # (Ubah NODE_ENV=production, ganti JWT Secret, dll)
 
 # Setup Database
 npx prisma generate
 npx prisma db push
 node prisma/seed.js  # Jalankan seeder untuk buat akun Admin pertama
+
 ```
 
-### 4. Jalankan Aplikasi dengan PM2
+### 2. Build Frontend
+```bash
+cd ..
+git clone https://github.com/zEchth/restaurant-frontend.git
+cd restaurant-frontend
+npm install
+npm run build
+```
+
+### 3. Jalankan Aplikasi dengan PM2
 ``` bash
+cd restaurant-management
 pm2 start src/server.js --name "resto-app"
 pm2 save
 pm2 startup
 ```
 
-### 5. Konfigurasi Reverse Proxy (Nginx)
+### 4. Konfigurasi Reverse Proxy (Nginx)
 ```bash
 # Agar aplikasi dapat diakses melalui port 80 (HTTP) tanpa mengetik port 3000
 # Edit config Nginx: /etc/nginx/sites-available/default

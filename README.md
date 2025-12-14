@@ -51,7 +51,7 @@ cd ../restaurant-frontend
 npm install
 npm run build
 
-Hasil build akan tersimpan di folder dist. Backend telah dikonfigurasi untuk melayani folder ini secara statis.
+# Hasil build akan tersimpan di folder dist. Backend telah dikonfigurasi untuk melayani folder ini secara statis.
 ```
 
 
