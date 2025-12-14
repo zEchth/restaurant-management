@@ -26,6 +26,9 @@ Sistem aplikasi Point of Sales (POS) Fullstack untuk manajemen restoran. Aplikas
 6. **Cetak Struk:** Modal detail pesanan siap cetak (Thermal Printer friendly).
 7. **Security:** Proteksi BOLA, Hashing Password, & Secure Headers.
 
+## Production URL
+http://100.30.4.153 atau http://ec2-100-30-4-153.compute-1.amazonaws.com
+
 ## 🚀 Cara Instalasi & Menjalankan
 
 ### 1. Setup Backend & Database
