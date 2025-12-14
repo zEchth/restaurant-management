@@ -4,6 +4,19 @@
 2.  **Tools:** Node.js v18+, NPM, Git, PM2.
 3.  **Database:** PostgreSQL (Production) atau SQLite (Simple).
 
+## Repo Github
+https://github.com/zEchth/restaurant-management.git     --> backend
+https://github.com/zEchth/restaurant-frontend.git       --> frontend
+
+## Production URL
+Production URL : 
+http://100.30.4.153 atau http://ec2-100-30-4-153.compute-1.amazonaws.com
+
+## Detail AWS EC2
+public ip (ip elastis)	: 100.30.4.153
+konfigurasi lain di kirim lewat pengumpulan
+
+
 ## Langkah Deployment
 
 ### 1. Clone & Setup Repository Backend
@@ -11,15 +24,16 @@
 Di server, clone repository proyek:
 
 ```bash
+# setelah koneksi ssh
 mkdir resto-app
 cd resto-app
 
-git clone https://github.com/zEchth/restaurant-management.git
+git clone https://github.com/zEchth/restaurant-management.git # backend
 cd restaurant-management
 npm install
 cp .env.example .env
 nano .env  # (Ubah NODE_ENV=production, ganti JWT Secret, dll) 
-# --> node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+# --> node -e "console.log(require('crypto').randomBytes(64).toString('hex'))" -> untuk isi jwt secret dan refresh
 
 # Setup Database
 npx prisma generate
@@ -32,7 +46,7 @@ node prisma/seed.js  # Jalankan seeder untuk buat akun Admin pertama
 
 ```bash
 cd ..
-git clone https://github.com/zEchth/restaurant-frontend.git
+git clone https://github.com/zEchth/restaurant-frontend.git # frontend
 cd restaurant-frontend
 npm install
 npm run build
@@ -91,7 +105,7 @@ pm2 monit
 ### 6. Maintenance
 
 ```bash
-# restaurant-frontend
+# restaurant-frontend & restaurant-management
 git pull
 npm run build
 sudo rm -rf /var/www/html/*
@@ -116,10 +130,10 @@ cp .env.example .env
 ## Health Check
 
 ````bash
-GET http://<IP-SERVER>/api/health 
+GET http://100.30.4.153/api/health 
 
 # Login
-curl -X POST http://<IP-SERVER>/api/auth/login \
+curl -X POST http://100.30.4.153/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@kafe.com","password":"password123"}'
 ```
