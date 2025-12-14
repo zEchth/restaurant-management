@@ -88,15 +88,29 @@ pm2 logs resto-app
 pm2 monit
 ```
 
-## Maintenance
+### 6. Maintenance
 
 ```bash
+# restaurant-frontend
 git pull
-cd restaurant-frontend
 npm run build
 sudo rm -rf /var/www/html/*
 sudo cp -r dist/* /var/www/html/
 pm2 restart resto-app
+
+```
+
+### 7. Strategi Backup:
+```bash
+# Jika server mati: resto-app/restaurant-management
+cp .env.example .env
+nano .env
+npx prisma db push
+node prisma/seed.js
+pm2 restart resto-app
+
+# resto-app/restaurant-frontend
+cp .env.example .env
 ```
 
 ## Health Check

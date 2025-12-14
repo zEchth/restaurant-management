@@ -41,11 +41,6 @@ cp .env.example .env
 npx prisma generate
 npx prisma db push
 node prisma/seed.js 
-
-# Jika server mati
-npx prisma db push
-node prisma/seed.js
-
 ```
 
 ### 2. Setup Frontend
