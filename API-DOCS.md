@@ -1,7 +1,7 @@
 ```markdown
 # Dokumentasi API
 
-Base URL: `http://localhost:3000/api`
+Base URL: `http://<IP-SERVER>/api`
 Auth: Bearer Token (Header `Authorization`)
 
 ## 1. Authentication (`/auth`)
@@ -46,4 +46,4 @@ Auth: Bearer Token (Header `Authorization`)
 ## 6. System
 | Method | Endpoint | Deskripsi |
 | :--- | :--- | :--- |
-| GET | `/health` | Cek status server (Uptime/OK). |
+| GET | `/api/health` | Cek status server (Uptime/OK). |
