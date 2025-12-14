@@ -44,22 +44,26 @@ node prisma/seed.js
 
 ```
 
-### 2. Setup Backend & Database
+### 2. Setup Frontend
 ```bash
 # Masuk ke folder frontend
 cd ../restaurant-frontend
 npm install
 npm run build
 
-# Hasil build akan tersimpan di folder dist. Backend telah dikonfigurasi untuk melayani folder ini secara statis.
+# Frontend disajikan melalui NGINX sebagai static files.
+# Backend berjalan sebagai REST API dan diakses melalui reverse proxy.
+
+#Akses aplikasi: http://<IP-SERVER>
+
 ```
 
+### 3. Menjalankan Aplikasi (Production)
 
-### 3. Jalankan Aplikasi (Full Stack)
+Backend dijalankan menggunakan PM2 dan frontend diserve oleh NGINX
 ```bash
-# Dari folder restaurant-management
-node src/server.js
-Buka browser: http://localhost:3000
+pm2 start src/server.js --name resto-app
+pm2 save
 ```
 
 ## 👥 Akun Demo (Seeder)
