@@ -2,6 +2,7 @@ require('dotenv').config(); // 1. Pindahkan ke paling atas (Best Practice)
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+// const path = require('path');
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
@@ -16,7 +17,6 @@ const app = express();
 app.use(cors({
   origin: 'http://100.28.231.115',
 }));
-app.use(express.json());
 app.use(express.json()); // Parsing body JSON
 
 // Logger hanya di Development

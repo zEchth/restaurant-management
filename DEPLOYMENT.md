@@ -132,7 +132,7 @@ cp .env.example .env
 
 ## Health Check
 
-````bash
+```bash
 GET http://100.30.4.153/api/health 
 
 # Login
