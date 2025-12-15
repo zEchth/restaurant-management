@@ -50,6 +50,9 @@ git clone https://github.com/zEchth/restaurant-frontend.git # frontend
 cd restaurant-frontend
 npm install
 npm run build
+
+sudo rm -rf /var/www/html/*
+sudo cp -r ~/resto-app/restaurant-frontend/dist/* /var/www/html/
 ```
 
 ### 3. Jalankan Aplikasi dengan PM2
