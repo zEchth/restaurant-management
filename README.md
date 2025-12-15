@@ -53,6 +53,9 @@ cd ../restaurant-frontend
 npm install
 npm run build
 
+sudo rm -rf /var/www/html/*
+sudo cp -r ~/resto-app/restaurant-frontend/dist/* /var/www/html/
+
 # Frontend disajikan melalui NGINX sebagai static files.
 # Backend berjalan sebagai REST API dan diakses melalui reverse proxy.
 
