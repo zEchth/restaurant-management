@@ -136,7 +136,7 @@ exports.deleteMenu = async (req, res, next) => {
   } catch (err) {
     // Handle error jika menu sudah pernah dipesan (Foreign Key Constraint)
     if (err.code === 'P2003') {
-        return errorResponse(res, 400, 'Menu tidak bisa dihapus karena sudah ada riwayat pesanan. Gunakan update isAvailable=false saja.');
+        return errorResponse(res, 400, 'Menu tidak bisa dihapus karena sudah ada riwayat pesanan.');
     }
     next(err);
   }

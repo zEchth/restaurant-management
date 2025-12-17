@@ -80,8 +80,7 @@ exports.refreshToken = async (req, res, next) => {
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
     if (!user) return res.status(403).json({ message: 'User tidak ditemukan' });
 
-    // Generate Access Token BARU saja (Refresh token biasanya tetap, atau di-rotate tergantung kebijakan)
-    // Di sini kita buat Access Token baru saja sesuai standar umum.
+    // Generate Access Token BARU (Refresh token biasanya tetap, atau di-rotate)
     const newAccessToken = jwt.sign(
       { id: user.id, role: user.role }, 
       process.env.JWT_SECRET, 

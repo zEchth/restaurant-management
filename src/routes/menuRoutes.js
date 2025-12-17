@@ -5,8 +5,6 @@ const menuController = require('../controllers/menuController');
 const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 // 1. Route PUBLIC / USER (Hanya Read)
-// Kita tetap pasang authenticate agar sistem lebih tertutup, 
-// tapi User biasa boleh akses.
 router.get('/', authenticate, menuController.getAllMenus);
 router.get('/:id', authenticate, menuController.getMenuById);
 

@@ -26,16 +26,16 @@ router.post('/', authorize('USER', 'ADMIN'), orderController.createOrder);
 // ROUTE SPESIFIK (Butuh ID)
 // ==========================================================
 
-// GET /api/orders/:id (Lihat Detail Order) <--- INI YANG BARU DITAMBAHKAN
+// GET /api/orders/:id (Lihat Detail Order)
 router.get('/:id', authorize('USER', 'ADMIN'), orderController.getOrderById);
 
 // PATCH /api/orders/:id/status (Update Status: PAID/READY)
 router.patch('/:id/status', authorize('USER', 'ADMIN'), orderController.updateStatus);
 
 // DELETE /api/orders/:id (Cancel Order)
-// Khusus route ini kita pakai middleware tambahan 'checkOrderOwnership'
-// agar proteksinya berlapis (BOLA Protection)
-router.delete('/:id', 
+// pakai middleware tambahan 'checkOrderOwnership'
+// BOLA Protection
+router.delete('/:id',
   authorize('USER', 'ADMIN'), 
   checkOrderOwnership, 
   orderController.cancelOrder

@@ -180,7 +180,7 @@ exports.updateStatus = async (req, res, next) => {
     const orderId = parseInt(req.params.id);
     const { status } = req.body;
 
-    const allowedStatuses = ['PAID', 'READY', 'PENDING', 'CANCELLED'];
+    const allowedStatuses = ['PAID', 'READY', 'PENDING'];
     if (!allowedStatuses.includes(status)) {
       return errorResponse(res, 400, 'Status tidak valid');
     }
@@ -198,7 +198,7 @@ exports.updateStatus = async (req, res, next) => {
   }
 };
 
-// 5. CANCEL ORDER (DELETE) - Ini yang tadi hilang!
+// 5. CANCEL ORDER (DELETE) 
 exports.cancelOrder = async (req, res, next) => {
   try {
     const orderId = parseInt(req.params.id);
