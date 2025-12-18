@@ -4,7 +4,13 @@ const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-// const path = require('path');
+
+const fs = require('fs');
+const path = require('path');
+
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+
+const compression = require('compression');
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
@@ -28,6 +34,7 @@ const limiter = rateLimit({
 });
 
 // Global Middleware
+app.use(compression());
 app.use(helmet({
   contentSecurityPolicy: false, 
   crossOriginResourcePolicy: { policy: "cross-origin" } 
@@ -37,7 +44,7 @@ app.use(express.json()); // Parsing body JSON
 
 // Logger hanya di Development
 if (process.env.NODE_ENV === 'production') {
-    app.use(morgan('combined')); // Format log standar untuk produksi
+    app.use(morgan('combined', { stream: accessLogStream })); 
 } else {
     app.use(morgan('dev')); // Format log 'dev' untuk pengembangan
 }
