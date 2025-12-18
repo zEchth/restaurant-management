@@ -16,8 +16,8 @@ const app = express();
 
 // Global Middleware
 app.use(helmet({
-  contentSecurityPolicy: false, // Matikan jika Anda banyak menggunakan CDN/Image luar
-  crossOriginResourcePolicy: { policy: "cross-origin" } // Izinkan resource diakses lintas domain
+  contentSecurityPolicy: false, 
+  crossOriginResourcePolicy: { policy: "cross-origin" } 
 }));
 app.use(express.json()); // Parsing body JSON
 
