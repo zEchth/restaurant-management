@@ -180,7 +180,7 @@ exports.updateStatus = async (req, res, next) => {
     const orderId = parseInt(req.params.id);
     const { status } = req.body;
 
-    const allowedStatuses = ['PAID', 'READY', 'PENDING'];
+    const allowedStatuses = ['PAID', 'READY', 'PENDING', 'COMPLETED'];  
     if (!allowedStatuses.includes(status)) {
       return errorResponse(res, 400, 'Status tidak valid');
     }

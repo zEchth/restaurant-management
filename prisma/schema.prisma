@@ -21,6 +21,7 @@ enum OrderStatus {
   PAID
   CANCELLED 
   READY
+  COMPLETED
 }
 
 // 1. Model User
