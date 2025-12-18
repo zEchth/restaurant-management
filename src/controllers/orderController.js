@@ -101,9 +101,9 @@ exports.getOrders = async (req, res, next) => {
     const whereClause = {};
 
     // Filter Role (User lihat punya sendiri, Admin lihat semua)
-    if (req.user.role !== 'ADMIN') {
-      whereClause.userId = req.user.id;
-    }
+    // if (req.user.role !== 'ADMIN') {
+    //   whereClause.userId = req.user.id;
+    // }
 
     // Filter Status
     if (status) whereClause.status = status;
