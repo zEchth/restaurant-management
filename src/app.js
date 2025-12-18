@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 // const path = require('path');
 
 // Import Routes
@@ -14,11 +15,24 @@ const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
+// Konfigurasi Limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // Jangka waktu: 15 menit
+  max: 100, // Batas: maksimal 100 request per IP dalam 15 menit
+  message: {
+    success: false,
+    message: "Terlalu banyak permintaan dari IP ini, silakan coba lagi setelah 15 menit"
+  },
+  standardHeaders: true, // Kembalikan info limit di header `RateLimit-*`
+  legacyHeaders: false, // Matikan header `X-RateLimit-*` yang lama
+});
+
 // Global Middleware
 app.use(helmet({
   contentSecurityPolicy: false, 
   crossOriginResourcePolicy: { policy: "cross-origin" } 
 }));
+app.use('/api/', limiter);
 app.use(express.json()); // Parsing body JSON
 
 // Logger hanya di Development
