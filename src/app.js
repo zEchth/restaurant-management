@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const helmet = require('helmet');
 // const path = require('path');
 
 // Import Routes
@@ -14,6 +15,10 @@ const userRoutes = require('./routes/userRoutes');
 const app = express();
 
 // Global Middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Matikan jika Anda banyak menggunakan CDN/Image luar
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Izinkan resource diakses lintas domain
+}));
 app.use(express.json()); // Parsing body JSON
 
 // Logger hanya di Development
