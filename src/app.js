@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const path = require('path');
+// const path = require('path');
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
@@ -23,9 +23,9 @@ if (process.env.NODE_ENV === 'production') {
     app.use(morgan('dev')); // Format log 'dev' untuk pengembangan
 }
 
-// app.use(cors({
-//   origin: 'http://100.28.231.115',
-// }));
+app.use(cors({
+  origin: 'http://100.28.231.115',
+}));
 
 // Routes Registration
 app.use('/api/auth', authRoutes);
@@ -45,14 +45,14 @@ app.get('/api/health', (req, res) => {
 });
 
 // --- SERVE FRONTEND (STATIC FILES) ---
-const frontendPath = path.join(__dirname, '../../restaurant-frontend/dist');
-app.use(express.static(frontendPath));
+// const frontendPath = path.join(__dirname, '../../restaurant-frontend/dist');
+// app.use(express.static(frontendPath));
 
 // 2. Handle React Routing (SPA)
 // Jika route tidak dikenali API, kirimkan index.html React
-app.use((req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
+// app.use((req, res) => {
+//   res.sendFile(path.join(frontendPath, 'index.html'));
+// });
 
 // 404 Handler (Route Not Found)
 app.use((req, res, next) => {
