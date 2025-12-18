@@ -108,11 +108,17 @@ pm2 monit
 ### 6. Maintenance
 
 ```bash
-# restaurant-frontend & restaurant-management
+# restaurant-management/backend
+git pull
+npx prisma migrate deploy
+npx prisma generate
+
+# restaurant-frontend
 git pull
 npm run build
 sudo rm -rf /var/www/html/*
 sudo cp -r dist/* /var/www/html/
+
 pm2 restart resto-app
 
 ```
